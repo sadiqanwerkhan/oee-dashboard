@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { OEEDisplay, ComponentBreakdown, PeriodComparison, TopDowntimeReasons, ShiftFilterComponent } from './components';
+import { OEEDisplay, ComponentBreakdown, PeriodComparison, TopDowntimeReasons, ShiftFilterComponent, ParetoChart, MiniChart, ExportButton } from './components';
 import { useFilteredOEE } from './hooks';
 import type { ProductionData, ShiftFilter } from './types';
 import productionDataJson from './data/production-data.json';
@@ -24,10 +24,13 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">
-          Production Line OEE Dashboard
-        </h1>
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Production Line OEE Dashboard
+          </h1>
+          <ExportButton data={data} metrics={oeeMetrics} />
+        </div>
         
         <div className="mb-6">
           <p className="text-gray-600 mb-2">
@@ -60,9 +63,21 @@ function App() {
         />
 
         <div className="mt-6">
+          <MiniChart
+            shifts={data.shifts}
+            downtimeEvents={filteredDowntimeEvents}
+            productionLine={data.productionLine}
+          />
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <TopDowntimeReasons
             downtimeEvents={topDowntimeReasons}
             limit={3}
+          />
+          
+          <ParetoChart
+            downtimeEvents={filteredDowntimeEvents}
           />
         </div>
       </div>
