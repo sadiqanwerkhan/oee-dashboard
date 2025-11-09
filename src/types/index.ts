@@ -77,5 +77,5 @@ export interface DowntimeCategorySummary {
 
 export type OEEStatus = 'world-class' | 'acceptable' | 'needs-attention';
 
-export type ShiftFilter = 'all' | 'shift_1' | 'shift_2' | 'shift_3';
+export type ShiftFilter = 'all' | string;
 

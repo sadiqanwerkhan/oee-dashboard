@@ -1,8 +1,5 @@
 import type { DowntimeEvent, DowntimeCategorySummary } from '../types';
 
-/**
- * Get downtime events for a specific shift
- */
 export function getShiftDowntimeEvents(
   shiftId: string,
   downtimeEvents: DowntimeEvent[]
@@ -10,9 +7,6 @@ export function getShiftDowntimeEvents(
   return downtimeEvents.filter(event => event.shiftId === shiftId);
 }
 
-/**
- * Get downtime events for multiple shifts
- */
 export function getMultipleShiftsDowntimeEvents(
   shiftIds: string[],
   downtimeEvents: DowntimeEvent[]
@@ -20,9 +14,6 @@ export function getMultipleShiftsDowntimeEvents(
   return downtimeEvents.filter(event => shiftIds.includes(event.shiftId));
 }
 
-/**
- * Aggregate downtime events by category
- */
 export function aggregateDowntimeByCategory(
   downtimeEvents: DowntimeEvent[]
 ): DowntimeCategorySummary[] {
@@ -47,9 +38,6 @@ export function aggregateDowntimeByCategory(
   return Array.from(categoryMap.values());
 }
 
-/**
- * Get top N downtime reasons sorted by duration
- */
 export function getTopDowntimeReasons(
   downtimeEvents: DowntimeEvent[],
   limit: number = 3
@@ -59,9 +47,6 @@ export function getTopDowntimeReasons(
     .slice(0, limit);
 }
 
-/**
- * Get top N downtime categories sorted by total duration
- */
 export function getTopDowntimeCategories(
   downtimeEvents: DowntimeEvent[],
   limit: number = 3
@@ -73,9 +58,6 @@ export function getTopDowntimeCategories(
     .slice(0, limit);
 }
 
-/**
- * Calculate total downtime for given events
- */
 export function calculateTotalDowntime(
   downtimeEvents: DowntimeEvent[]
 ): number {
@@ -85,9 +67,6 @@ export function calculateTotalDowntime(
   );
 }
 
-/**
- * Filter downtime events by type (planned/unplanned)
- */
 export function filterDowntimeByType(
   downtimeEvents: DowntimeEvent[],
   type: 'planned' | 'unplanned'
@@ -95,9 +74,6 @@ export function filterDowntimeByType(
   return downtimeEvents.filter(event => event.type === type);
 }
 
-/**
- * Format duration in minutes to human-readable string
- */
 export function formatDuration(minutes: number): string {
   if (minutes < 60) {
     return `${minutes}m`;
@@ -112,4 +88,3 @@ export function formatDuration(minutes: number): string {
   
   return `${hours}h ${remainingMinutes}m`;
 }
-
