@@ -1,5 +1,6 @@
 import type { OEEMetrics, PreviousPeriod } from '../types';
-import { formatPercentage, formatDelta, calculateDelta } from '../utils/oeeCalculations';
+import { formatPercentage, calculateDelta } from '../utils/oeeCalculations';
+import { TrendIndicator } from './TrendIndicator';
 
 interface PeriodComparisonProps {
   currentMetrics: OEEMetrics;
@@ -64,19 +65,17 @@ export function PeriodComparison({
       
       <div className="space-y-3">
         {metrics.map((metric) => {
-          const isPositive = metric.delta >= 0;
-          const deltaColor = isPositive ? 'text-green-600' : 'text-red-600';
-          const deltaBgColor = isPositive ? 'bg-green-50' : 'bg-red-50';
-          const arrow = isPositive ? '↑' : '↓';
-
           return (
             <div
               key={metric.label}
               className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors"
             >
               <div className="flex-1">
-                <div className="text-sm font-medium text-gray-700 mb-1">
-                  {metric.label}
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="text-sm font-medium text-gray-700">
+                    {metric.label}
+                  </div>
+                  <TrendIndicator delta={metric.delta} size="sm" />
                 </div>
                 <div className="flex items-baseline gap-3">
                   <div className="text-lg font-semibold text-gray-900">
@@ -88,10 +87,7 @@ export function PeriodComparison({
                 </div>
               </div>
               
-              <div className={`px-3 py-1 rounded-full text-sm font-medium ${deltaBgColor} ${deltaColor} flex items-center gap-1`}>
-                <span>{arrow}</span>
-                <span>{formatDelta(metric.delta)}</span>
-              </div>
+              <TrendIndicator delta={metric.delta} size="md" />
             </div>
           );
         })}
