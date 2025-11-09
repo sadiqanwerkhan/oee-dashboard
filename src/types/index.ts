@@ -1,25 +1,22 @@
-// Production Line Types
 export interface ProductionLine {
   id: string;
   name: string;
-  targetCycleTime: number; // in seconds
+  targetCycleTime: number; 
   description: string;
 }
 
-// Shift Types
 export interface Shift {
   id: string;
   name: string;
   startTime: string;
   endTime: string;
-  plannedProductionTime: number; // in minutes
+  plannedProductionTime: number;
   targetQuantity: number;
   actualQuantity: number;
   goodQuantity: number;
   defectQuantity: number;
 }
 
-// Downtime Event Types
 export type DowntimeType = 'planned' | 'unplanned';
 
 export interface DowntimeEvent {
@@ -33,12 +30,11 @@ export interface DowntimeEvent {
   type: DowntimeType;
 }
 
-// OEE Calculation Types
 export interface OEEMetrics {
-  availability: number; // 0-1 (0-100%)
-  performance: number; // 0-1 (0-100%)
-  quality: number; // 0-1 (0-100%)
-  oee: number; // 0-1 (0-100%)
+  availability: number;
+  performance: number; 
+  quality: number;
+  oee: number; 
 }
 
 export interface OEEDelta {
@@ -48,7 +44,6 @@ export interface OEEDelta {
   oee: number;
 }
 
-// Previous Period Data
 export interface PreviousPeriod {
   description: string;
   totalOEE: number;
@@ -57,7 +52,6 @@ export interface PreviousPeriod {
   quality: number;
 }
 
-// Metadata Types
 export interface Metadata {
   site: string;
   department: string;
@@ -66,7 +60,6 @@ export interface Metadata {
   minimumAcceptableOEE: number;
 }
 
-// Complete Production Data Structure
 export interface ProductionData {
   productionLine: ProductionLine;
   shifts: Shift[];
@@ -75,7 +68,6 @@ export interface ProductionData {
   metadata: Metadata;
 }
 
-// Downtime Category Summary
 export interface DowntimeCategorySummary {
   category: string;
   totalDurationMinutes: number;
@@ -83,9 +75,7 @@ export interface DowntimeCategorySummary {
   type: DowntimeType;
 }
 
-// OEE Status Types
 export type OEEStatus = 'world-class' | 'acceptable' | 'needs-attention';
 
-// Shift Filter Types
 export type ShiftFilter = 'all' | 'shift_1' | 'shift_2' | 'shift_3';
 
