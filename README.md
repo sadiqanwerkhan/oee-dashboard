@@ -65,6 +65,16 @@ npm run preview
 npm run lint
 ```
 
+#### Testing
+```bash
+npm test
+```
+
+Run tests in watch mode or with UI:
+```bash
+npm run test:ui
+```
+
 ## Architecture Decisions
 
 ### 1. Separation of Concerns
@@ -166,8 +176,22 @@ src/
 │   └── index.ts
 ├── data/               # Static data
 │   └── production-data.json
+├── test/               # Test setup
+│   └── setup.ts
 ├── App.tsx             # Main application component
 └── main.tsx            # Application entry point
+```
+
+## Testing
+
+The project includes unit tests demonstrating testing best practices:
+
+- **Utility Function Tests** (`src/utils/oeeCalculations.test.ts`): Comprehensive tests for OEE calculation functions including edge cases, boundary conditions, and data validation
+- **Hook Tests** (`src/hooks/useOEE.test.tsx`): Tests for custom React hooks using React Testing Library, including memoization behavior verification
+
+Run tests with:
+```bash
+npm test
 ```
 
 ## Future Enhancements
@@ -193,8 +217,9 @@ src/
 1. Create a feature branch from `main`
 2. Make your changes following the established architecture patterns
 3. Ensure all linting passes (`npm run lint`)
-4. Test your changes thoroughly
-5. Submit a pull request
+4. Run tests to ensure nothing breaks (`npm test`)
+5. Test your changes thoroughly
+6. Submit a pull request
 
 ## License
 
