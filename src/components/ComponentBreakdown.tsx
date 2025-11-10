@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import type { OEEMetrics } from '../types';
 import { formatPercentage } from '../utils/oeeCalculations';
 
@@ -6,36 +7,40 @@ interface ComponentBreakdownProps {
   showLabels?: boolean;
 }
 
-export function ComponentBreakdown({
+const COMPONENT_CONFIG = [
+  {
+    name: 'Availability',
+    description: 'Operating Time / Planned Production Time',
+    color: 'bg-blue-500',
+    bgColor: 'bg-blue-50',
+    textColor: 'text-blue-700',
+  },
+  {
+    name: 'Performance',
+    description: 'Actual Quantity / Ideal Quantity',
+    color: 'bg-purple-500',
+    bgColor: 'bg-purple-50',
+    textColor: 'text-purple-700',
+  },
+  {
+    name: 'Quality',
+    description: 'Good Quantity / Actual Quantity',
+    color: 'bg-green-500',
+    bgColor: 'bg-green-50',
+    textColor: 'text-green-700',
+  },
+] as const;
+
+function ComponentBreakdownComponent({
   metrics,
   showLabels = true,
 }: ComponentBreakdownProps) {
-  const components = [
-    {
-      name: 'Availability',
-      value: metrics.availability,
-      description: 'Operating Time / Planned Production Time',
-      color: 'bg-blue-500',
-      bgColor: 'bg-blue-50',
-      textColor: 'text-blue-700',
-    },
-    {
-      name: 'Performance',
-      value: metrics.performance,
-      description: 'Actual Quantity / Ideal Quantity',
-      color: 'bg-purple-500',
-      bgColor: 'bg-purple-50',
-      textColor: 'text-purple-700',
-    },
-    {
-      name: 'Quality',
-      value: metrics.quality,
-      description: 'Good Quantity / Actual Quantity',
-      color: 'bg-green-500',
-      bgColor: 'bg-green-50',
-      textColor: 'text-green-700',
-    },
-  ];
+  const components = useMemo(() => {
+    return COMPONENT_CONFIG.map((config, index) => ({
+      ...config,
+      value: index === 0 ? metrics.availability : index === 1 ? metrics.performance : metrics.quality,
+    }));
+  }, [metrics.availability, metrics.performance, metrics.quality]);
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
@@ -74,4 +79,6 @@ export function ComponentBreakdown({
     </div>
   );
 }
+
+export const ComponentBreakdown = memo(ComponentBreakdownComponent);
 

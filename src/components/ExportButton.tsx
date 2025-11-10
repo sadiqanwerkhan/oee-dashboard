@@ -1,3 +1,4 @@
+import { memo, useCallback, useMemo } from 'react';
 import type { ProductionData, OEEMetrics } from '../types';
 import { exportToJSON, exportToCSV, downloadFile } from '../utils/exportUtils';
 
@@ -6,18 +7,20 @@ interface ExportButtonProps {
   metrics: OEEMetrics;
 }
 
-export function ExportButton({ data, metrics }: ExportButtonProps) {
-  const handleExportJSON = () => {
-    const jsonContent = exportToJSON(data, metrics);
-    const filename = `oee-dashboard-${data.metadata.reportDate}.json`;
-    downloadFile(jsonContent, filename, 'application/json');
-  };
+function ExportButtonComponent({ data, metrics }: ExportButtonProps) {
+  const filename = useMemo(() => {
+    return `oee-dashboard-${data.metadata.reportDate}`;
+  }, [data.metadata.reportDate]);
 
-  const handleExportCSV = () => {
+  const handleExportJSON = useCallback(() => {
+    const jsonContent = exportToJSON(data, metrics);
+    downloadFile(jsonContent, `${filename}.json`, 'application/json');
+  }, [data, metrics, filename]);
+
+  const handleExportCSV = useCallback(() => {
     const csvContent = exportToCSV(data, metrics);
-    const filename = `oee-dashboard-${data.metadata.reportDate}.csv`;
-    downloadFile(csvContent, filename, 'text/csv');
-  };
+    downloadFile(csvContent, `${filename}.csv`, 'text/csv');
+  }, [data, metrics, filename]);
 
   return (
     <div className="flex gap-2">
@@ -43,4 +46,6 @@ export function ExportButton({ data, metrics }: ExportButtonProps) {
     </div>
   );
 }
+
+export const ExportButton = memo(ExportButtonComponent);
 

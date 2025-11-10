@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import type { DowntimeEvent } from '../types';
 import { getTopDowntimeReasons, formatDuration } from '../utils/downtimeUtils';
 
@@ -7,12 +8,14 @@ interface TopDowntimeReasonsProps {
   title?: string;
 }
 
-export function TopDowntimeReasons({
+function TopDowntimeReasonsComponent({
   downtimeEvents,
   limit = 3,
   title = 'Top Downtime Reasons',
 }: TopDowntimeReasonsProps) {
-  const topReasons = getTopDowntimeReasons(downtimeEvents, limit);
+  const topReasons = useMemo(() => {
+    return getTopDowntimeReasons(downtimeEvents, limit);
+  }, [downtimeEvents, limit]);
 
   if (topReasons.length === 0) {
     return (
@@ -68,4 +71,6 @@ export function TopDowntimeReasons({
     </div>
   );
 }
+
+export const TopDowntimeReasons = memo(TopDowntimeReasonsComponent);
 

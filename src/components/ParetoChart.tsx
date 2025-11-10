@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import type { DowntimeEvent } from '../types';
 import { aggregateDowntimeByCategory, formatDuration } from '../utils/downtimeUtils';
 
@@ -6,14 +7,32 @@ interface ParetoChartProps {
   title?: string;
 }
 
-export function ParetoChart({
+function ParetoChartComponent({
   downtimeEvents,
   title = 'Pareto Analysis - Downtime Categories',
 }: ParetoChartProps) {
-  const categories = aggregateDowntimeByCategory(downtimeEvents);
-  const sortedCategories = [...categories].sort(
-    (a, b) => b.totalDurationMinutes - a.totalDurationMinutes
-  );
+  const sortedCategories = useMemo(() => {
+    const categories = aggregateDowntimeByCategory(downtimeEvents);
+    return [...categories].sort(
+      (a, b) => b.totalDurationMinutes - a.totalDurationMinutes
+    );
+  }, [downtimeEvents]);
+
+  const { totalDowntime, maxDuration } = useMemo(() => {
+    if (sortedCategories.length === 0) {
+      return { totalDowntime: 0, maxDuration: 1 };
+    }
+    
+    const total = sortedCategories.reduce(
+      (sum, cat) => sum + cat.totalDurationMinutes,
+      0
+    );
+    
+    return {
+      totalDowntime: total,
+      maxDuration: sortedCategories[0]?.totalDurationMinutes || 1,
+    };
+  }, [sortedCategories]);
 
   if (sortedCategories.length === 0) {
     return (
@@ -23,13 +42,6 @@ export function ParetoChart({
       </div>
     );
   }
-
-  const totalDowntime = sortedCategories.reduce(
-    (sum, cat) => sum + cat.totalDurationMinutes,
-    0
-  );
-
-  const maxDuration = sortedCategories[0]?.totalDurationMinutes || 1;
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
@@ -114,4 +126,6 @@ export function ParetoChart({
     </div>
   );
 }
+
+export const ParetoChart = memo(ParetoChartComponent);
 

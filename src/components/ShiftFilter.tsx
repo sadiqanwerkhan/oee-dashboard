@@ -1,3 +1,4 @@
+import { memo, useMemo, useCallback } from 'react';
 import type { Shift, ShiftFilter } from '../types';
 
 interface ShiftFilterProps {
@@ -6,18 +7,24 @@ interface ShiftFilterProps {
   onFilterChange: (filter: ShiftFilter) => void;
 }
 
-export function ShiftFilterComponent({
+function ShiftFilterComponentInternal({
   shifts,
   selectedFilter,
   onFilterChange,
 }: ShiftFilterProps) {
-  const filterOptions: { value: ShiftFilter; label: string }[] = [
-    { value: 'all', label: 'All Shifts' },
-    ...shifts.map((shift) => ({
-      value: shift.id,
-      label: shift.name,
-    })),
-  ];
+  const filterOptions = useMemo(() => {
+    return [
+      { value: 'all' as ShiftFilter, label: 'All Shifts' },
+      ...shifts.map((shift) => ({
+        value: shift.id as ShiftFilter,
+        label: shift.name,
+      })),
+    ];
+  }, [shifts]);
+
+  const handleClick = useCallback((value: ShiftFilter) => {
+    onFilterChange(value);
+  }, [onFilterChange]);
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -29,7 +36,7 @@ export function ShiftFilterComponent({
           return (
             <button
               key={option.value}
-              onClick={() => onFilterChange(option.value)}
+              onClick={() => handleClick(option.value)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 isSelected
                   ? 'bg-blue-600 text-white shadow-sm'
@@ -44,4 +51,6 @@ export function ShiftFilterComponent({
     </div>
   );
 }
+
+export const ShiftFilterComponent = memo(ShiftFilterComponentInternal);
 

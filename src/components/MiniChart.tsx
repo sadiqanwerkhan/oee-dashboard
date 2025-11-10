@@ -1,4 +1,5 @@
-import type { Shift, OEEMetrics } from '../types';
+import { memo, useMemo } from 'react';
+import type { Shift } from '../types';
 import { formatPercentage } from '../utils/oeeCalculations';
 import { calculateShiftOEE } from '../utils/oeeCalculations';
 import type { ProductionLine, DowntimeEvent } from '../types';
@@ -10,18 +11,22 @@ interface MiniChartProps {
   title?: string;
 }
 
-export function MiniChart({
+function MiniChartComponent({
   shifts,
   downtimeEvents,
   productionLine,
   title = 'OEE by Shift',
 }: MiniChartProps) {
-  const shiftMetrics = shifts.map(shift => ({
-    shift,
-    metrics: calculateShiftOEE(shift, downtimeEvents, productionLine),
-  }));
+  const shiftMetrics = useMemo(() => {
+    return shifts.map(shift => ({
+      shift,
+      metrics: calculateShiftOEE(shift, downtimeEvents, productionLine),
+    }));
+  }, [shifts, downtimeEvents, productionLine]);
 
-  const maxOEE = Math.max(...shiftMetrics.map(sm => sm.metrics.oee), 0.01);
+  const maxOEE = useMemo(() => {
+    return Math.max(...shiftMetrics.map(sm => sm.metrics.oee), 0.01);
+  }, [shiftMetrics]);
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
@@ -68,4 +73,6 @@ export function MiniChart({
     </div>
   );
 }
+
+export const MiniChart = memo(MiniChartComponent);
 

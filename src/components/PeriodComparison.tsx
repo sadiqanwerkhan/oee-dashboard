@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import type { OEEMetrics, PreviousPeriod } from '../types';
 import { formatPercentage, calculateDelta } from '../utils/oeeCalculations';
 import { TrendIndicator } from './TrendIndicator';
@@ -7,11 +8,53 @@ interface PeriodComparisonProps {
   previousPeriod: PreviousPeriod | null;
 }
 
-export function PeriodComparison({
+function PeriodComparisonComponent({
   currentMetrics,
   previousPeriod,
 }: PeriodComparisonProps) {
-  if (!previousPeriod) {
+  const deltas = useMemo(() => {
+    if (!previousPeriod) return null;
+    
+    return {
+      availability: calculateDelta(currentMetrics.availability, previousPeriod.availability),
+      performance: calculateDelta(currentMetrics.performance, previousPeriod.performance),
+      quality: calculateDelta(currentMetrics.quality, previousPeriod.quality),
+      oee: calculateDelta(currentMetrics.oee, previousPeriod.totalOEE),
+    };
+  }, [currentMetrics, previousPeriod]);
+
+  const metrics = useMemo(() => {
+    if (!previousPeriod || !deltas) return null;
+    
+    return [
+      {
+        label: 'OEE',
+        current: currentMetrics.oee,
+        previous: previousPeriod.totalOEE,
+        delta: deltas.oee,
+      },
+      {
+        label: 'Availability',
+        current: currentMetrics.availability,
+        previous: previousPeriod.availability,
+        delta: deltas.availability,
+      },
+      {
+        label: 'Performance',
+        current: currentMetrics.performance,
+        previous: previousPeriod.performance,
+        delta: deltas.performance,
+      },
+      {
+        label: 'Quality',
+        current: currentMetrics.quality,
+        previous: previousPeriod.quality,
+        delta: deltas.quality,
+      },
+    ];
+  }, [currentMetrics, previousPeriod, deltas]);
+
+  if (!previousPeriod || !metrics) {
     return (
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -21,40 +64,6 @@ export function PeriodComparison({
       </div>
     );
   }
-
-  const deltas = {
-    availability: calculateDelta(currentMetrics.availability, previousPeriod.availability),
-    performance: calculateDelta(currentMetrics.performance, previousPeriod.performance),
-    quality: calculateDelta(currentMetrics.quality, previousPeriod.quality),
-    oee: calculateDelta(currentMetrics.oee, previousPeriod.totalOEE),
-  };
-
-  const metrics = [
-    {
-      label: 'OEE',
-      current: currentMetrics.oee,
-      previous: previousPeriod.totalOEE,
-      delta: deltas.oee,
-    },
-    {
-      label: 'Availability',
-      current: currentMetrics.availability,
-      previous: previousPeriod.availability,
-      delta: deltas.availability,
-    },
-    {
-      label: 'Performance',
-      current: currentMetrics.performance,
-      previous: previousPeriod.performance,
-      delta: deltas.performance,
-    },
-    {
-      label: 'Quality',
-      current: currentMetrics.quality,
-      previous: previousPeriod.quality,
-      delta: deltas.quality,
-    },
-  ];
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
@@ -95,4 +104,6 @@ export function PeriodComparison({
     </div>
   );
 }
+
+export const PeriodComparison = memo(PeriodComparisonComponent);
 

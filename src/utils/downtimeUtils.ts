@@ -11,7 +11,8 @@ export function getMultipleShiftsDowntimeEvents(
   shiftIds: string[],
   downtimeEvents: DowntimeEvent[]
 ): DowntimeEvent[] {
-  return downtimeEvents.filter(event => shiftIds.includes(event.shiftId));
+  const shiftIdSet = new Set(shiftIds);
+  return downtimeEvents.filter(event => shiftIdSet.has(event.shiftId));
 }
 
 export function aggregateDowntimeByCategory(

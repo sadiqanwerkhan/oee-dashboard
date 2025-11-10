@@ -36,12 +36,18 @@ export function useFilteredOEE(
   productionLine: ProductionLine,
   shiftFilter: 'all' | string
 ): OEEMetrics {
+  const shiftMap = useMemo(() => {
+    const map = new Map<string, Shift>();
+    shifts.forEach(shift => map.set(shift.id, shift));
+    return map;
+  }, [shifts]);
+
   return useMemo(() => {
     if (shiftFilter === 'all') {
       return calculateFullDayOEE(shifts, downtimeEvents, productionLine);
     }
     
-    const filteredShift = shifts.find(shift => shift.id === shiftFilter);
+    const filteredShift = shiftMap.get(shiftFilter);
     if (!filteredShift) {
       return {
         availability: 0,
@@ -52,6 +58,6 @@ export function useFilteredOEE(
     }
     
     return calculateShiftOEE(filteredShift, downtimeEvents, productionLine);
-  }, [shifts, downtimeEvents, productionLine, shiftFilter]);
+  }, [shifts, downtimeEvents, productionLine, shiftFilter, shiftMap]);
 }
 

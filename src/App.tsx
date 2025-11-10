@@ -1,26 +1,36 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { OEEDisplay, ComponentBreakdown, PeriodComparison, TopDowntimeReasons, ShiftFilterComponent, ParetoChart, MiniChart, ExportButton } from './components';
 import { useFilteredOEE } from './hooks';
 import type { ProductionData, ShiftFilter } from './types';
 import productionDataJson from './data/production-data.json';
 import { getTopDowntimeReasons } from './utils/downtimeUtils';
 
+const DATA = productionDataJson as ProductionData;
+
 function App() {
-  const data = productionDataJson as ProductionData;
   const [shiftFilter, setShiftFilter] = useState<ShiftFilter>('all');
   
   const oeeMetrics = useFilteredOEE(
-    data.shifts,
-    data.downtimeEvents,
-    data.productionLine,
+    DATA.shifts,
+    DATA.downtimeEvents,
+    DATA.productionLine,
     shiftFilter
   );
 
-  const filteredDowntimeEvents = shiftFilter === 'all'
-    ? data.downtimeEvents
-    : data.downtimeEvents.filter(event => event.shiftId === shiftFilter);
+  const filteredDowntimeEvents = useMemo(() => {
+    if (shiftFilter === 'all') {
+      return DATA.downtimeEvents;
+    }
+    return DATA.downtimeEvents.filter(event => event.shiftId === shiftFilter);
+  }, [shiftFilter]);
   
-  const topDowntimeReasons = getTopDowntimeReasons(filteredDowntimeEvents, 3);
+  const topDowntimeReasons = useMemo(() => {
+    return getTopDowntimeReasons(filteredDowntimeEvents, 3);
+  }, [filteredDowntimeEvents]);
+
+  const handleFilterChange = useCallback((filter: ShiftFilter) => {
+    setShiftFilter(filter);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -29,29 +39,29 @@ function App() {
           <h1 className="text-3xl font-bold text-gray-900">
             Production Line OEE Dashboard
           </h1>
-          <ExportButton data={data} metrics={oeeMetrics} />
+          <ExportButton data={DATA} metrics={oeeMetrics} />
         </div>
         
         <div className="mb-6">
           <p className="text-gray-600 mb-2">
-            <span className="font-semibold">Production Line:</span> {data.productionLine.name}
+            <span className="font-semibold">Production Line:</span> {DATA.productionLine.name}
           </p>
           <p className="text-gray-600 mb-4">
-            <span className="font-semibold">Site:</span> {data.metadata.site} - {data.metadata.department}
+            <span className="font-semibold">Site:</span> {DATA.metadata.site} - {DATA.metadata.department}
           </p>
           
           <ShiftFilterComponent
-            shifts={data.shifts}
+            shifts={DATA.shifts}
             selectedFilter={shiftFilter}
-            onFilterChange={setShiftFilter}
+            onFilterChange={handleFilterChange}
           />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <OEEDisplay
             metrics={oeeMetrics}
-            worldClassThreshold={data.metadata.worldClassOEETarget}
-            minimumThreshold={data.metadata.minimumAcceptableOEE}
+            worldClassThreshold={DATA.metadata.worldClassOEETarget}
+            minimumThreshold={DATA.metadata.minimumAcceptableOEE}
           />
           
           <ComponentBreakdown metrics={oeeMetrics} />
@@ -59,14 +69,14 @@ function App() {
 
         <PeriodComparison
           currentMetrics={oeeMetrics}
-          previousPeriod={data.previousPeriod}
+          previousPeriod={DATA.previousPeriod}
         />
 
         <div className="mt-6">
           <MiniChart
-            shifts={data.shifts}
+            shifts={DATA.shifts}
             downtimeEvents={filteredDowntimeEvents}
-            productionLine={data.productionLine}
+            productionLine={DATA.productionLine}
           />
         </div>
 
