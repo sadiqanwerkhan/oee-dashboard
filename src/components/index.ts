@@ -7,4 +7,7 @@ export { TrendIndicator } from './TrendIndicator';
 export { ParetoChart } from './ParetoChart';
 export { MiniChart } from './MiniChart';
 export { ExportButton } from './ExportButton';
+export { ErrorBoundary } from './ErrorBoundary';
+export { LoadingSpinner } from './LoadingSpinner';
+export { ErrorDisplay } from './ErrorDisplay';
 

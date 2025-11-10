@@ -40,17 +40,19 @@ function OEEDisplayComponent({
   
   const config = STATUS_CONFIG[status];
   
-  const formattedOEE = useMemo(() => formatPercentage(metrics.oee), [metrics.oee]);
-  const formattedAvailability = useMemo(() => formatPercentage(metrics.availability), [metrics.availability]);
-  const formattedPerformance = useMemo(() => formatPercentage(metrics.performance), [metrics.performance]);
-  const formattedQuality = useMemo(() => formatPercentage(metrics.quality), [metrics.quality]);
+  const formattedMetrics = useMemo(() => ({
+    oee: formatPercentage(metrics.oee),
+    availability: formatPercentage(metrics.availability),
+    performance: formatPercentage(metrics.performance),
+    quality: formatPercentage(metrics.quality),
+  }), [metrics.oee, metrics.availability, metrics.performance, metrics.quality]);
 
   return (
     <div className={`rounded-lg border-2 p-6 ${config.bgColor} ${config.color}`}>
       <h2 className="text-lg font-semibold mb-2 text-gray-800">{title}</h2>
       
       <div className="flex items-baseline gap-3 mb-4">
-        <span className="text-5xl font-bold">{formattedOEE}</span>
+        <span className="text-5xl font-bold">{formattedMetrics.oee}</span>
         <span className={`px-3 py-1 rounded-full text-sm font-medium ${config.bgColor} border ${config.color.replace('text-', 'border-')}`}>
           {config.label}
         </span>
@@ -60,21 +62,21 @@ function OEEDisplayComponent({
         <div className="text-center">
           <div className="text-xs font-medium text-gray-600 mb-1">Availability</div>
           <div className="text-2xl font-semibold text-gray-800">
-            {formattedAvailability}
+            {formattedMetrics.availability}
           </div>
         </div>
         
         <div className="text-center">
           <div className="text-xs font-medium text-gray-600 mb-1">Performance</div>
           <div className="text-2xl font-semibold text-gray-800">
-            {formattedPerformance}
+            {formattedMetrics.performance}
           </div>
         </div>
         
         <div className="text-center">
           <div className="text-xs font-medium text-gray-600 mb-1">Quality</div>
           <div className="text-2xl font-semibold text-gray-800">
-            {formattedQuality}
+            {formattedMetrics.quality}
           </div>
         </div>
       </div>

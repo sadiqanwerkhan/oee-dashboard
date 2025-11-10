@@ -160,6 +160,9 @@ src/
 │   ├── ParetoChart.tsx          # Pareto analysis
 │   ├── MiniChart.tsx            # Shift comparison chart
 │   ├── ExportButton.tsx         # Export functionality
+│   ├── ErrorBoundary.tsx        # Error boundary component
+│   ├── LoadingSpinner.tsx       # Loading state component
+│   ├── ErrorDisplay.tsx         # Error display component
 │   └── index.ts                 # Component exports
 ├── hooks/              # Custom React hooks
 │   ├── useOEE.ts               # OEE calculation hooks
@@ -182,6 +185,28 @@ src/
 └── main.tsx            # Application entry point
 ```
 
+## Error Handling & Loading States
+
+### Error Boundaries
+
+The application implements React Error Boundaries to gracefully handle runtime errors:
+
+- **Global Error Boundary** (`src/components/ErrorBoundary.tsx`): Wraps the entire application in `main.tsx` to catch and display any unhandled errors
+- **Error Display Component** (`src/components/ErrorDisplay.tsx`): Provides user-friendly error messages with retry functionality
+- **Error Logging**: Errors are logged to the console for debugging while showing a clean UI to users
+
+Error boundaries prevent the entire application from crashing and provide users with actionable feedback when something goes wrong.
+
+### Loading States
+
+The application handles async data loading with proper loading states:
+
+- **Loading Spinner** (`src/components/LoadingSpinner.tsx`): Displays a centered loading indicator while data is being fetched
+- **Async Data Loading**: The `useProductionData` hook manages loading state, error state, and data state
+- **Graceful Degradation**: The UI shows appropriate loading or error states before rendering the dashboard
+
+This ensures users always see feedback about the application state, improving the overall user experience.
+
 ## Testing
 
 The project includes unit tests demonstrating testing best practices:
@@ -193,6 +218,26 @@ Run tests with:
 ```bash
 npm test
 ```
+
+## Analysis: Key Challenges & Recommendations
+
+### Problem 1: Data Scalability & Performance
+
+**Challenge**: As production data grows (multiple lines, extended time periods, high-frequency downtime events), the current in-memory processing approach may become a bottleneck. Filtering and calculating OEE for thousands of events on every render could impact performance.
+
+**Recommendation**: Implement React Query (TanStack Query) for server state management. This provides automatic caching, background refetching, and request deduplication. For client-side filtering of large datasets, consider virtualizing lists or implementing pagination. Additionally, move heavy calculations to Web Workers for non-blocking processing.
+
+### Problem 2: Real-time Data Synchronization
+
+**Challenge**: The current implementation loads data once on mount. In a production environment, OEE metrics need to update in real-time as shifts progress and downtime events occur. Manual refresh is not practical for production managers who need live visibility.
+
+**Recommendation**: Integrate WebSocket connections for real-time updates. Use React Query's mutation system to update cached data when new events arrive. Implement optimistic updates for immediate UI feedback while the server confirms the change. Consider using Server-Sent Events (SSE) as a fallback for environments where WebSockets are restricted.
+
+### Problem 3: State Management Complexity
+
+**Challenge**: As features expand (multi-line support, advanced filtering, historical analysis), managing state with `useState` and `useMemo` becomes increasingly complex. The current approach works well for single-line dashboards but may struggle with interdependent filters, date ranges, and multiple data sources.
+
+**Recommendation**: Introduce `useReducer` for complex state that involves multiple related values (filters, date ranges, selected lines). For global state shared across many components, consider Zustand or Jotai for lightweight state management. Reserve React Query for server state (API data) and keep local UI state (filters, UI preferences) in React hooks or a small state management library.
 
 ## Future Enhancements
 
